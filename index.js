@@ -3,6 +3,9 @@
 const replace = require("replace-in-file")
 const inquirer = require("inquirer")
 const fs = require("fs")
+const chalk = require("chalk")
+
+const filesToIgnore = [".DS_Store", "node_modules", "package-lock.json"]
 
 const CURR_DIR = process.cwd()
 const choices = fs.readdirSync(`${__dirname}/templates`)
@@ -31,25 +34,25 @@ const questions = [
 ]
 
 inquirer.prompt(questions).then(answers => {
-  console.log(answers)
+  console.clear()
+
   const { projectChoice, projectName, modulesDirPath } = answers
   const templatePath = `${__dirname}/templates/${projectChoice}`
 
-  console.log(templatePath)
   // Create the App directory in current directory
-  console.log(`creating new app directory: ${projectName}`)
+  console.log(chalk.magenta(`creating new app directory: ${projectName}`))
   const appDir = `${CURR_DIR}/${projectName}`
   fs.mkdirSync(appDir)
   createDirectoryContents(templatePath, projectName).then(() => {
+    console.log(chalk.magenta("App directory successfully created"))
     // Create a module directory for this app within the modules directory
-    console.log(`creating new module directory: ${modulesDirPath}/${projectName}`)
+    console.log(chalk.magenta(`creating new module directory: ${modulesDirPath}/${projectName}`))
     createModuleDirectory(modulesDirPath, projectName)
 
     modifyAfterBuildScript(appDir, projectName)
     modifyHtmlQueueFooter(appDir, projectName)
 
-    console.log(`cd ${projectName}`)
-    console.log("npm install")
+    printSuccessMessage(projectName)
   })
 })
 
@@ -63,17 +66,22 @@ function createDirectoryContents(templatePath, newProjectPath) {
       // get stats about the current file
       const stats = fs.statSync(origFilePath)
       if (stats.isFile()) {
-        const contents = fs.readFileSync(origFilePath, "utf8")
-
-        const writePath = `${CURR_DIR}/${newProjectPath}/${file}`
-        fs.writeFileSync(writePath, contents, "utf8")
+        if (!filesToIgnore.includes(file)) {
+          const contents = fs.readFileSync(origFilePath, "utf8")
+          const writePath = `${CURR_DIR}/${newProjectPath}/${file}`
+          fs.writeFileSync(writePath, contents, "utf8")
+          console.log(chalk.blue(`${newProjectPath}/${file} file created`))
+        }
       } else if (stats.isDirectory()) {
-        fs.mkdirSync(`${CURR_DIR}/${newProjectPath}/${file}`)
-        // recursive call
-        createDirectoryContents(`${templatePath}/${file}`, `${newProjectPath}/${file}`)
+        if (!filesToIgnore.includes(file)) {
+          fs.mkdirSync(`${CURR_DIR}/${newProjectPath}/${file}`)
+          console.log(chalk.green(`${newProjectPath}/${file}/ directory created`))
+          // recursive call
+          createDirectoryContents(`${templatePath}/${file}`, `${newProjectPath}/${file}`)
+        }
       }
     })
-    resolve("directory created")
+    resolve()
   })
 }
 
@@ -86,14 +94,14 @@ function modifyAfterBuildScript(appDir, projectName) {
   }
   try {
     let changedFiles = replace.sync(options)
-    console.log("Modified files:", changedFiles.join(", "))
+    console.log(chalk.bgMagenta(`Modified files: ${appDir}/afterBuild.js`))
   } catch (error) {
     console.error("Error occurred:", error)
   }
 }
 
 function modifyHtmlQueueFooter(appDir, projectName) {
-  console.log("modifying HTMLQueue Footer", appDir, projectName)
+  console.log("modifying HTMLQueue Footer")
   const options = {
     files: `${appDir}/htmlQueue/footer.cfm`,
     from: /projectNamePlaceholder/g,
@@ -101,9 +109,9 @@ function modifyHtmlQueueFooter(appDir, projectName) {
   }
   try {
     let changedFiles = replace.sync(options)
-    console.log("Modified files:", changedFiles)
+    console.log(chalk.bgMagenta(`Modified files: ${appDir}/htmlQueue/footer.cfm`))
   } catch (error) {
-    console.error("Error occurred:", error)
+    console.error(chalk.bgRed("Error occurred:", error))
   }
 }
 
@@ -132,9 +140,17 @@ function createModuleDirectory(modulesDirPath, projectName) {
     }
     try {
       let changedFiles = replace.sync(options)
-      console.log("Modified files:", changedFiles)
+      console.log(chalk.bgMagenta(`Modified files: ${newModuleDirPath}/${file}`))
     } catch (error) {
-      console.error("Error occurred:", error)
+      console.error(chalk.bgRed("Error occurred:", error))
     }
   })
+}
+
+function printSuccessMessage(projectName) {
+  console.log("\n")
+  console.log(`You're ready to go!`)
+  console.log(`cd ${projectName}`)
+  console.log("npm install")
+  console.log("npm run serve")
 }
