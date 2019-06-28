@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const replace = require("replace-in-file")
 const inquirer = require("inquirer")
 const fs = require("fs")
