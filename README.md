@@ -8,7 +8,15 @@ Navigate to your the directory where you would like to install the JS app.
 npm install -g create-mura-apps
 ```
 
-Note that the NPM package currently called `create-mura-apps`. I plan to change this back to `create-mura-app` (I accidentally temporarily blocked this name)
+Note that the NPM package is currently called `create-mura-apps` (with an 's'). I plan to change this back to `create-mura-app` (I accidentally temporarily blocked this name)
+
+### Create a new app
+
+```
+create-mura-app
+```
+
+Note that the command does not have an 's'. Sorry again for the confusion... This will be fixed shortly.
 
 ### Answer prompts
 
