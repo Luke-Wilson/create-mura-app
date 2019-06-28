@@ -6,17 +6,18 @@ const fs = require("fs")
 
 const indexHtml = fs.readFileSync("./dist/index.html", "utf-8")
 
-var reManifest = /static\/js\/manifest\.(.*?)\.js/g
-var reApp = /static\/js\/app\.(.*?)\.js/g
-var reVendor = /static\/js\/vendor\.(.*?)\.js/g
-var reCSS = /static\/css\/app\.(.*?)\.css/g
+var reManifest = /js\/manifest\.(.*?)\.js/g
+var reApp = /js\/app\.(.*?)\.js/g
+var reVendor = /js\/chunk-vendors\.(.*?)\.js/g
+var reCSS = /css\/app\.(.*?)\.css/g
 
-var manifest = indexHtml.match(reManifest)[0]
+// var manifest = indexHtml.match(reManifest)[0]
+var manifest = ""
 var app = indexHtml.match(reApp)[0]
 var vendor = indexHtml.match(reVendor)[0]
 var css = indexHtml.match(reCSS)[0]
 
-const manifestScriptString = `<cfset manifestJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${manifest}">`
+// const manifestScriptString = `<cfset manifestJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${manifest}">`
 const vendorScriptString = `<cfset vendorJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${vendor}">`
 const appScriptString = `<cfset appJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${app}">`
 const cssScriptString = `<cfset appCSS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${css}">`
