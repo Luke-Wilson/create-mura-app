@@ -18,6 +18,7 @@ var vendor = indexHtml.match(reVendor)[0]
 var css = indexHtml.match(reCSS)[0]
 
 // const manifestScriptString = `<cfset manifestJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${manifest}">`
+const manifestScriptString = ""
 const vendorScriptString = `<cfset vendorJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${vendor}">`
 const appScriptString = `<cfset appJS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${app}">`
 const cssScriptString = `<cfset appCSS = "#$.siteConfig('themeAssetPath')#/apps/projectNamePlaceholder/dist/${css}">`
