@@ -23,11 +23,16 @@ const questions = [
       else return "Project name may only include letters, numbers, underscores and hashes."
     },
   },
+  {
+    name: "modulesDirPath",
+    type: "input",
+    message: "Path to the modules directory, relative to the current directory (e.g.  ../../modules )",
+  },
 ]
 
 inquirer.prompt(questions).then(answers => {
   console.log(answers)
-  const { projectChoice, projectName } = answers
+  const { projectChoice, projectName, modulesDirPath } = answers
   const templatePath = `${__dirname}/templates/${projectChoice}`
 
   console.log(templatePath)
@@ -38,14 +43,18 @@ inquirer.prompt(questions).then(answers => {
 
   createDirectoryContents(templatePath, projectName)
 
+  // Create a module directory for this app within the modules directory
+  createModuleDirectory(modulesDirPath, projectName)
+
   setTimeout(() => {
     modifyAfterBuildScript(appDir, projectName)
     modifyHtmlQueueFooter(appDir, projectName)
+    console.log(`cd ${projectName}`)
+    console.log("npm install")
   }, 2000)
 })
 
 function createDirectoryContents(templatePath, newProjectPath) {
-  console.log("creating app directory contents")
   const filesToCreate = fs.readdirSync(templatePath)
 
   filesToCreate.forEach(file => {
@@ -95,4 +104,36 @@ function modifyHtmlQueueFooter(appDir, projectName) {
   } catch (error) {
     console.error("Error occurred:", error)
   }
+}
+
+function createModuleDirectory(modulesDirPath, projectName) {
+  // create the new module directory
+  const newModuleDirPath = `${modulesDirPath}/${projectName}`
+  fs.mkdirSync(newModuleDirPath)
+
+  // Copy across moduleFiles to the new module directory
+  const moduleFiles = fs.readdirSync(`${__dirname}/moduleFiles/`)
+  moduleFiles.forEach(file => {
+    const origFilePath = `${__dirname}/moduleFiles/${file}`
+    const contents = fs.readFileSync(origFilePath, "utf8")
+    const writePath = `${newModuleDirPath}/${file}`
+    fs.writeFileSync(writePath, contents, "utf8")
+  })
+
+  // replace projectPlaceholder with projectName
+  const newModuleFiles = fs.readdirSync(newModuleDirPath)
+  newModuleFiles.forEach(file => {
+    const origFilePath = `${newModuleDirPath}/${file}`
+    const options = {
+      files: origFilePath,
+      from: /projectNamePlaceholder/g,
+      to: projectName,
+    }
+    try {
+      let changedFiles = replace.sync(options)
+      console.log("Modified files:", changedFiles)
+    } catch (error) {
+      console.error("Error occurred:", error)
+    }
+  })
 }
