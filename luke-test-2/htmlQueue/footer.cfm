@@ -1,0 +1,29 @@
+<cfif request.muraSysEnv.MURA_ENVIRONMENT eq "local" or request.muraSysEnv.MURA_ENVIRONMENT eq "offline">
+	<cfoutput>
+		<script>
+			m(function(){
+				m.loader()
+					.loadjs(
+						"http://localhost:8080/app.js"
+					);
+			});
+		</script>
+	</cfoutput>
+	<cfelse>
+	<cfoutput>
+<!--inject:luke-test-2--><cfset manifestJS = "#$.siteConfig('themeAssetPath')#/apps/luke-test-2/dist/"><cfset vendorJS = "#$.siteConfig('themeAssetPath')#/apps/luke-test-2/dist/js/chunk-vendors.85e0982e.js"><cfset appJS = "#$.siteConfig('themeAssetPath')#/apps/luke-test-2/dist/js/app.60e663b7.js"><cfset appCSS = "#$.siteConfig('themeAssetPath')#/apps/luke-test-2/dist/css/app.f24bd0cc.css"><!--/inject:luke-test-2-->
+	<script>
+			m(function(){
+				m.loader()
+					.loadcss(
+						"#appCSS#"
+					)
+					.loadjs(
+						"#manifestJS#",
+						"#vendorJS#",
+						"#appJS#"
+					);
+			});
+		</script>
+	</cfoutput>
+</cfif>

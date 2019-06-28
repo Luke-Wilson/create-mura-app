@@ -1,0 +1,29 @@
+<cfif request.muraSysEnv.MURA_ENVIRONMENT eq "local" or request.muraSysEnv.MURA_ENVIRONMENT eq "offline">
+	<cfoutput>
+		<script>
+			m(function(){
+				m.loader()
+					.loadjs(
+						"http://localhost:8080/app.js"
+					);
+			});
+		</script>
+	</cfoutput>
+	<cfelse>
+	<cfoutput>
+<!--inject:projectNamePlaceholder-->If you see this, you need to run npm build. If you have and still see this, check the afterBuild.js script.<!--/inject:projectNamePlaceholder-->
+	<script>
+			m(function(){
+				m.loader()
+					.loadcss(
+						"#appCSS#"
+					)
+					.loadjs(
+						"#manifestJS#",
+						"#vendorJS#",
+						"#appJS#"
+					);
+			});
+		</script>
+	</cfoutput>
+</cfif>

@@ -1,0 +1,20 @@
+{
+  "name": "murafy-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "es5",
+    "printWidth": 200
+  },
+  "author": "Luke Wilson <luke@lukewilson.net> (http://www.lukewilson.net)",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^6.4.1",
+    "replace-in-file": "^4.1.0"
+  }
+}
