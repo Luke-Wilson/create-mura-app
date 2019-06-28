@@ -37,42 +37,43 @@ inquirer.prompt(questions).then(answers => {
 
   console.log(templatePath)
   // Create the App directory in current directory
-  console.log(`creating new directory: ${projectName}`)
+  console.log(`creating new app directory: ${projectName}`)
   const appDir = `${CURR_DIR}/${projectName}`
   fs.mkdirSync(appDir)
+  createDirectoryContents(templatePath, projectName).then(() => {
+    // Create a module directory for this app within the modules directory
+    console.log(`creating new module directory: ${modulesDirPath}/${projectName}`)
+    createModuleDirectory(modulesDirPath, projectName)
 
-  createDirectoryContents(templatePath, projectName)
-
-  // Create a module directory for this app within the modules directory
-  createModuleDirectory(modulesDirPath, projectName)
-
-  setTimeout(() => {
     modifyAfterBuildScript(appDir, projectName)
     modifyHtmlQueueFooter(appDir, projectName)
+
     console.log(`cd ${projectName}`)
     console.log("npm install")
-  }, 2000)
+  })
 })
 
 function createDirectoryContents(templatePath, newProjectPath) {
-  const filesToCreate = fs.readdirSync(templatePath)
+  return new Promise((resolve, reject) => {
+    const filesToCreate = fs.readdirSync(templatePath)
 
-  filesToCreate.forEach(file => {
-    const origFilePath = `${templatePath}/${file}`
+    filesToCreate.forEach(file => {
+      const origFilePath = `${templatePath}/${file}`
 
-    // get stats about the current file
-    const stats = fs.statSync(origFilePath)
+      // get stats about the current file
+      const stats = fs.statSync(origFilePath)
+      if (stats.isFile()) {
+        const contents = fs.readFileSync(origFilePath, "utf8")
 
-    if (stats.isFile()) {
-      const contents = fs.readFileSync(origFilePath, "utf8")
-
-      const writePath = `${CURR_DIR}/${newProjectPath}/${file}`
-      fs.writeFileSync(writePath, contents, "utf8")
-    } else if (stats.isDirectory()) {
-      fs.mkdirSync(`${CURR_DIR}/${newProjectPath}/${file}`)
-      // recursive call
-      createDirectoryContents(`${templatePath}/${file}`, `${newProjectPath}/${file}`)
-    }
+        const writePath = `${CURR_DIR}/${newProjectPath}/${file}`
+        fs.writeFileSync(writePath, contents, "utf8")
+      } else if (stats.isDirectory()) {
+        fs.mkdirSync(`${CURR_DIR}/${newProjectPath}/${file}`)
+        // recursive call
+        createDirectoryContents(`${templatePath}/${file}`, `${newProjectPath}/${file}`)
+      }
+    })
+    resolve("directory created")
   })
 }
 
