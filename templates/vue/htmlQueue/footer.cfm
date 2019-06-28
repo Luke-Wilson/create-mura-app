@@ -19,7 +19,7 @@
 						"#appCSS#"
 					)
 					.loadjs(
-						"#manifestJS#",
+						"#aboutJS#",
 						"#vendorJS#",
 						"#appJS#"
 					);
